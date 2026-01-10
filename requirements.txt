@@ -10,8 +10,8 @@ sqlalchemy==2.0.23
 alembic==1.13.0
 
 # AI模型 & 深度学习
-transformers==4.41.2
-torch==2.1.1
+torch>=2.5.0
+transformers>=4.40.0
 scikit-learn>=1.5.1,<1.6.0
 dashscope>=1.14.0  # 用于通义千问 API
 
