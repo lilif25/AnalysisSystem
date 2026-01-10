@@ -1,0 +1,53 @@
+# 后端框架 & API
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+python-multipart==0.0.6
+requests==2.31.0
+
+# 数据库
+sqlalchemy==2.0.23
+alembic==1.13.0
+
+# AI模型 & 深度学习
+torch>=2.5.0
+transformers>=4.40.0
+scikit-learn>=1.5.1,<1.6.0
+dashscope>=1.14.0  # 用于通义千问 API
+
+# 自然语言处理 (NLP)
+numpy>=1.26.4,<1.27
+pandas>=2.2.2,<2.3.0
+nltk==3.8.1
+spacy==3.7.2
+jieba==0.42.1
+vaderSentiment==3.3.2  # 情感分析库
+
+# 图像处理
+opencv-python==4.8.1.78
+pillow==10.1.0
+matplotlib==3.8.2
+
+# 音频处理
+librosa==0.10.1
+soundfile==0.12.1
+pydub==0.25.1
+
+# 前端 (Streamlit)
+streamlit>=1.29.0
+plotly==5.17.0
+streamlit-extras==0.3.5
+wordcloud==1.9.2
+seaborn==0.13.0
+
+# 数据处理工具
+openpyxl>=3.1.0  # 用于读取 Excel 文件
+
+# 常用工具
+python-dotenv==1.0.0
+loguru==0.7.2
+typer==0.9.0
+rich==13.7.0
+
+# 部署
+gunicorn==21.2.0
