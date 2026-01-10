@@ -43,12 +43,12 @@ conda create -n project python=3.10.19
 # 激活环境
 
 # 安装依赖
-pip install -r requirements.txt
+pip install -r requirements_all.txt
 ```
 
 ```bash
 # 安装依赖
-pip install -r requirements.txt
+pip install -r requirements_all.txt
 ```
 
 ### 2. 配置 API Key
