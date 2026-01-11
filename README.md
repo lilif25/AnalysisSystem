@@ -41,13 +41,8 @@
 # 创建conda环境
 conda create -n project python=3.10.19
 # 激活环境
+conda activate project
 
-# 安装依赖
-pip install -r backend/requirements.txt
-pip install -r frontend/requirements.txt
-```
-
-```bash
 # 安装依赖
 pip install -r backend/requirements.txt
 pip install -r frontend/requirements.txt
@@ -65,9 +60,10 @@ export DASHSCOPE_API_KEY="your_api_key_here"
 后端负责处理 AI 分析请求。确保先启动后端，否则前端无法进行分析。
 
 ```bash
-# 在项目根目录下运行
-export PYTHONPATH=$PYTHONPATH:$(pwd)/View
-python View/backend/main.py
+# 打开终端窗口 1
+cd backend
+# 启动服务 (自动重载模式)
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 *服务默认运行在 `http://localhost:8000`*
 
@@ -75,9 +71,9 @@ python View/backend/main.py
 前端提供可视化交互界面。
 
 ```bash
-# 打开新的终端窗口，进入 frontend 目录
-cd View/frontend
-python -m streamlit run app.py  # 用当前的虚拟环境运行
+# 打开终端窗口 2
+cd frontend
+python -m streamlit run app.py
 ```
 *应用将自动在浏览器打开，地址通常为 `http://localhost:8501`*
 
@@ -85,18 +81,20 @@ python -m streamlit run app.py  # 用当前的虚拟环境运行
 
 ```
 project/
-├── Analysis/               # 数据预处理脚本
-├── View/
-│   ├── backend/            # FastAPI 后端服务
-│   │   ├── api/routes/     # API 路由 (multimodal_analysis.py 等)
-│   │   └── main.py         # 后端入口
-│   ├── frontend/           # Streamlit 前端应用
-│   │   ├── app.py          # 前端入口
-│   │   ├── components/     # 页面组件 (comment_analysis.py, image_analysis.py)
-│   │   └── utils/          # 工具函数
-│   ├── models/             # 模型封装 (image_model.py, text_model.py)
-│   └── requirements.txt    # 项目依赖 (请优先使用根目录的 requirements.txt)
-├── requirements.txt        # 全局依赖配置
+├── backend/                # FastAPI 后端服务
+│   ├── api/routes/         # API 路由 (如 multimodal_analysis.py)
+│   ├── models/             # 后端模型定义
+│   ├── services/           # 业务逻辑服务
+│   ├── main.py             # 后端应用入口
+│   ├── Dockerfile          # 后端 Docker 构建文件
+│   └── requirements.txt    # 后端 Python 依赖
+├── frontend/               # Streamlit 前端应用
+│   ├── components/         # UI 组件 (侧边栏、分析页等)
+│   ├── models/             # 前端模型定义 (独立于后端)
+│   ├── utils/              # 前端工具函数
+│   ├── app.py              # 前端应用入口
+│   ├── Dockerfile          # 前端 Docker 构建文件
+│   └── requirements.txt    # 前端 Python 依赖
 └── README.md               # 项目说明文档
 ```
 
