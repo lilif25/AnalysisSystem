@@ -43,7 +43,7 @@ def show_home():
     with col1:
         st.markdown("""
         <div class="css-card" style="height: 100%;">
-            <h4 style="font-size: 22px;">📝 文本分析</h4>
+            <h4 style="font-size: 22px;">文本分析</h4>
             <ul style="font-size: 18px; line-height: 1.6;">
                 <li>情感倾向分析</li>
                 <li>关键词智能提取</li>
@@ -56,7 +56,7 @@ def show_home():
     with col2:
         st.markdown("""
         <div class="css-card" style="height: 100%;">
-            <h4 style="font-size: 22px;">🖼️ 图像分析</h4>
+            <h4 style="font-size: 22px;">图像分析</h4>
             <ul style="font-size: 18px; line-height: 1.6;">
                 <li>对象智能识别</li>
                 <li>场景自动理解</li>
@@ -104,7 +104,7 @@ def show_home():
     st.markdown("---")
     st.markdown("""
     <div style='text-align: center; color: #6c757d; font-size: 1.2rem;'>
-        📧 邮箱: feedback@example.com ｜ 📞 电话: 400-123-4567<br>
-        🌐 网站: www.example.com
+        邮箱: feedback@example.com ｜ 电话: 400-123-4567<br>
+        网站: www.example.com
     </div>
     """, unsafe_allow_html=True)
