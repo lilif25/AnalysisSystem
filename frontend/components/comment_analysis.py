@@ -145,7 +145,7 @@ def show_comment_analysis():
                         st.error(f"处理失败: {e}")
     
     with st.sidebar.expander("重置数据", expanded=False):
-        st.button("确认重置所有数据", on_click=reset_data)
+        st.button("重置所有数据", on_click=reset_data)
     
     # -------------------------------------------------------------------------
     # 历史分析记录 (Historical Analysis)
