@@ -58,7 +58,7 @@ def show_image_analysis():
                         
                         # 调用API (注意：分析API不在/api/v1下，而是在根路径下的/analyze)
                         base_url = API_BASE_URL.replace("/api/v1", "")
-                        response = requests.post(f"{base_url}/analyze/image", files=files)
+                        response = requests.post(f"{backend_url}/analyze/image", files=files)
                         
                         if response.status_code == 200:
                             result = response.json()

@@ -98,9 +98,213 @@ def render_interactive_layout(section_id, component_map, initial_order):
         st.markdown('</div>', unsafe_allow_html=True)
 
 
+def render_sidebar():
+    """
+    渲染侧边栏控制组件 (数据管理、筛选等)
+    返回: filtered_df (筛选后的数据), 或 None
+    """
+    # -------------------------------------------------------------------------
+    # 侧边栏：文本分析 (控制项)
+    # -------------------------------------------------------------------------
+    
+    # 1. 数据管理
+    with st.sidebar.expander("数据管理", expanded=False):
+        # 定义历史保留文件路径
+        frontend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        data_dir = os.path.join(frontend_dir, 'data')
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir)
+            
+        history_dir = os.path.join(data_dir, 'history')
+        if not os.path.exists(history_dir):
+            os.makedirs(history_dir)
+            
+        history_file_path = os.path.join(data_dir, 'user_upload_history.csv')
+        
+        # 自动加载历史
+        if 'custom_comment_data' not in st.session_state and not st.session_state.get('data_cleared', False):
+            if os.path.exists(history_file_path):
+                try:
+                    loaded_df = pd.read_csv(history_file_path)
+                    st.session_state['custom_comment_data'] = loaded_df
+                except Exception as e:
+                    print(f"Failed to load history: {e}")
+
+        if 'uploader_key' not in st.session_state:
+            st.session_state['uploader_key'] = 0
+            
+        def reset_data():
+            if 'custom_comment_data' in st.session_state:
+                try:
+                    df_to_save = st.session_state['custom_comment_data']
+                    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                    history_save_path = os.path.join(history_dir, f"analysis_{timestamp}.csv")
+                    df_to_save.to_csv(history_save_path, index=False)
+                except Exception as e:
+                    print(f"Error archiving history: {e}")
+                del st.session_state['custom_comment_data']
+            
+            if 'viewing_history' in st.session_state:
+                st.session_state['viewing_history'] = False
+            
+            if os.path.exists(history_file_path):
+                try:
+                    os.remove(history_file_path)
+                except Exception as e:
+                    print(f"Error removing temp history file: {e}")
+
+            st.session_state['uploader_key'] += 1
+            st.session_state['data_cleared'] = True
+            
+        st.markdown("#### 上传新数据")
+        uploaded_file = st.file_uploader(
+            "选择文件 (CSV/XLSX)", 
+            type=['csv', 'xlsx'], 
+            key=f"uploader_{st.session_state['uploader_key']}",
+            label_visibility="collapsed"
+        )
+        
+        if uploaded_file:
+            if st.button("处理并分析", use_container_width=True):
+                with st.spinner("正在处理数据..."):
+                    try:
+                        if uploaded_file.name.endswith('.csv'):
+                            raw_df = pd.read_csv(uploaded_file)
+                        else:
+                            raw_df = pd.read_excel(uploaded_file)
+                        
+                        processed_df = process_uploaded_data(raw_df)
+                        st.session_state['custom_comment_data'] = processed_df
+                        st.session_state['viewing_history'] = False
+                        
+                        try:
+                            processed_df.to_csv(history_file_path, index=False)
+                        except Exception as e:
+                            st.warning(f"无法保存历史记录: {e}")
+
+                        st.session_state['data_cleared'] = False
+                        st.success("数据处理完成！")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"处理失败: {e}")
+        
+        if st.button("🗑️ 重置所有数据", on_click=reset_data, use_container_width=True):
+            pass
+            
+    # 2. 历史记录
+    if os.path.exists(history_dir):
+        history_files = [f for f in os.listdir(history_dir) if f.endswith('.csv')]
+        if history_files:
+            with st.sidebar.expander("历史记录", expanded=False):
+                if st.button("清空历史", key="clear_all_history", use_container_width=True):
+                    for f in history_files:
+                        try:
+                            os.remove(os.path.join(history_dir, f))
+                        except Exception as e:
+                            print(f"Failed to delete {f}: {e}")
+                    if st.session_state.get('viewing_history', False):
+                        if 'custom_comment_data' in st.session_state:
+                            del st.session_state['custom_comment_data']
+                        st.session_state['viewing_history'] = False
+                        st.session_state['data_cleared'] = True
+                    st.success("历史记录已清空")
+                    st.rerun()
+
+                history_files.sort(reverse=True)
+                for f in history_files:
+                    try:
+                        ts_part = f.replace("analysis_", "").replace(".csv", "")
+                        dt = datetime.datetime.strptime(ts_part, "%Y%m%d_%H%M%S")
+                        display_time = dt.strftime("%Y-%m-%d %H:%M")
+                        
+                        if st.button(f"{display_time}", key=f"hist_{f}", use_container_width=True):
+                            with st.spinner(f"加载 {display_time}..."):
+                                try:
+                                    loaded_df = pd.read_csv(os.path.join(history_dir, f))
+                                    st.session_state['custom_comment_data'] = loaded_df
+                                    loaded_df.to_csv(history_file_path, index=False)
+                                    st.session_state['data_cleared'] = False
+                                    st.session_state['viewing_history'] = True
+                                    st.rerun()
+                                except Exception as load_err:
+                                    st.error(f"加载失败: {load_err}")
+                    except:
+                        continue
+
+    # 3. 数据准备 (Dataframe Construction)
+    df = None
+    if 'custom_comment_data' in st.session_state:
+        processed_df = st.session_state['custom_comment_data']
+        sentiment_map = {"正面": "positive", "负面": "negative", "中性": "neutral"}
+        
+        # 构造 UI 用的 DF
+        data = {
+            'id': range(1, len(processed_df) + 1),
+            'comment': processed_df['review_content'],
+            'sentiment': processed_df['sentiment_label'].map(sentiment_map).fillna('neutral'),
+            'rating': processed_df['rating'],
+            'category': processed_df['product_category'],
+            'solution': processed_df.get('solution', [None]*len(processed_df))
+        }
+        
+        # Date 处理
+        if 'date' in processed_df.columns:
+             data['date'] = pd.to_datetime(processed_df['date'])
+        else:
+             # Mock dates
+             mock_dates = pd.date_range(start='2023-01-01', periods=len(processed_df), freq='H')
+             if len(mock_dates) < len(processed_df):
+                 mock_dates = np.random.choice(mock_dates, len(processed_df))
+             mock_dates_list = list(mock_dates)
+             np.random.shuffle(mock_dates_list)
+             data['date'] = mock_dates_list
+             
+        df = pd.DataFrame(data)
+    
+    # 4. 筛选器
+    filtered_df = None
+    if df is not None:
+        with st.sidebar.expander("数据筛选", expanded=True):
+            st.caption("情感类型")
+            sentiment_filter = st.multiselect(
+                "Select Sentiment",
+                options=df['sentiment'].unique(),
+                default=df['sentiment'].unique(),
+                label_visibility="collapsed"
+            )
+            
+            st.caption("评分范围")
+            rating_filter = st.slider(
+                "Select Rating",
+                min_value=int(df['rating'].min()),
+                max_value=int(df['rating'].max()),
+                value=(int(df['rating'].min()), int(df['rating'].max())),
+                label_visibility="collapsed"
+            )
+            
+            st.caption("产品分类")
+            category_filter = st.multiselect(
+                "Select Category",
+                options=df['category'].unique(),
+                default=df['category'].unique(),
+                label_visibility="collapsed"
+            )
+            
+            # Apply
+            filtered_df = df[
+                (df['sentiment'].isin(sentiment_filter)) &
+                (df['rating'].between(rating_filter[0], rating_filter[1])) &
+                (df['category'].isin(category_filter))
+            ].copy()
+            
+    # Save to session (vital for show_comment_analysis)
+    st.session_state['ca_filtered_df'] = filtered_df
+    return filtered_df
+
+
 def show_comment_analysis():
     """
-    显示评论分析页面
+    显示评论分析页面 (内容区域)
     """
     render_header("评论分析", "深度挖掘用户评论中的情感与观点")
     
@@ -112,251 +316,15 @@ def show_comment_analysis():
             if 'custom_comment_data' in st.session_state:
                 del st.session_state['custom_comment_data']
             st.session_state['viewing_history'] = False
-            # 确保清空状态正确
             st.session_state['data_cleared'] = True
             st.rerun()
 
+    # 从 Session State 获取筛选后的数据
+    filtered_df = st.session_state.get('ca_filtered_df', None)
     
-    # -------------------------------------------------------------------------
-    # 数据管理功能 (上传 & 重置)
-    # -------------------------------------------------------------------------
-    st.sidebar.markdown("### 数据管理")
-    
-    # 定义历史保留文件路径
-    # View/frontend/components/comment_analysis.py -> View/frontend/data/user_upload_history.csv
-    frontend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    data_dir = os.path.join(frontend_dir, 'data')
-    if not os.path.exists(data_dir):
-        os.makedirs(data_dir)
-        
-    # 定义及创建 Historical Analysis 目录
-    history_dir = os.path.join(data_dir, 'history')
-    if not os.path.exists(history_dir):
-        os.makedirs(history_dir)
-        
-    history_file_path = os.path.join(data_dir, 'user_upload_history.csv')
-    
-    # 尝试自动加载历史数据 (如果当前还没有加载数据且用户没有手动清空过)
-    if 'custom_comment_data' not in st.session_state and not st.session_state.get('data_cleared', False):
-        if os.path.exists(history_file_path):
-            try:
-                loaded_df = pd.read_csv(history_file_path)
-                st.session_state['custom_comment_data'] = loaded_df
-                # st.toast("已恢复上次分析的数据")
-            except Exception as e:
-                # 如果读取失败，忽略错误，等待用户重新上传
-                print(f"Failed to load history: {e}")
-
-    # 初始化 uploader_key 用于重置文件上传控件
-    if 'uploader_key' not in st.session_state:
-        st.session_state['uploader_key'] = 0
-        
-    def reset_data():
-        """重置数据的回调函数"""
-        if 'custom_comment_data' in st.session_state:
-            # 1. 保存当前数据到 Historical Analysis
-            try:
-                df_to_save = st.session_state['custom_comment_data']
-                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-                history_save_path = os.path.join(history_dir, f"analysis_{timestamp}.csv")
-                df_to_save.to_csv(history_save_path, index=False)
-            except Exception as e:
-                print(f"Error archiving history: {e}")
-            
-            # 2. 从 session state 中删除
-            del st.session_state['custom_comment_data']
-            
-        # 清除查看历史的状态
-        if 'viewing_history' in st.session_state:
-            st.session_state['viewing_history'] = False
-        
-        # 删除本地临时历史记录文件 (user_upload_history.csv)
-        if os.path.exists(history_file_path):
-            try:
-                os.remove(history_file_path)
-            except Exception as e:
-                print(f"Error removing temp history file: {e}")
-
-        # 增加 key 值，强制重新渲染 file_uploader，从而清空已上传的文件
-        st.session_state['uploader_key'] += 1
-        # 标记数据已清空
-        st.session_state['data_cleared'] = True
-        
-    with st.sidebar.expander("上传新数据 (CSV/XLSX)", expanded=False):
-        uploaded_file = st.file_uploader(
-            "选择文件", 
-            type=['csv', 'xlsx'], 
-            key=f"uploader_{st.session_state['uploader_key']}"
-        )
-        
-        if uploaded_file:
-            if st.button("处理并分析"):
-                with st.spinner("正在处理数据..."):
-                    try:
-                        if uploaded_file.name.endswith('.csv'):
-                            raw_df = pd.read_csv(uploaded_file)
-                        else:
-                            raw_df = pd.read_excel(uploaded_file)
-                        
-                        processed_df = process_uploaded_data(raw_df)
-                        st.session_state['custom_comment_data'] = processed_df
-                        # 上传新数据意味着不再是单纯的查看历史模式
-                        st.session_state['viewing_history'] = False
-                        
-                        # 保存到本地历史记录
-                        try:
-                            processed_df.to_csv(history_file_path, index=False)
-                        except Exception as e:
-                            st.warning(f"无法保存历史记录: {e}")
-
-                        # 重置清空标记
-                        st.session_state['data_cleared'] = False
-                        st.success("数据处理完成！")
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"处理失败: {e}")
-    
-    with st.sidebar.expander("重置数据", expanded=False):
-        st.button("重置所有数据", on_click=reset_data)
-    
-    # -------------------------------------------------------------------------
-    # 历史分析记录 (Historical Analysis)
-    # -------------------------------------------------------------------------
-    if os.path.exists(history_dir):
-        # 获取所有历史文件
-        history_files = [f for f in os.listdir(history_dir) if f.endswith('.csv')]
-        
-        if history_files:
-            st.sidebar.markdown("---")
-            hist_expander = st.sidebar.expander("📜 历史分析记录", expanded=False)
-            
-            # 清空历史记录按钮
-            if hist_expander.button("🗑️ 清空所有历史", key="clear_all_history"):
-                for f in history_files:
-                    try:
-                        os.remove(os.path.join(history_dir, f))
-                    except Exception as e:
-                        print(f"Failed to delete {f}: {e}")
-                
-                # 如果当前正在查看历史，也将其清除
-                if st.session_state.get('viewing_history', False):
-                    if 'custom_comment_data' in st.session_state:
-                         del st.session_state['custom_comment_data']
-                    st.session_state['viewing_history'] = False
-                    st.session_state['data_cleared'] = True
-                
-                st.success("历史记录已清空")
-                st.rerun()
-
-            # 按文件名倒序排列 (最新的在前，因为文件名包含时间戳)
-            history_files.sort(reverse=True)
-            
-            for f in history_files:
-                try:
-                    # 从文件名解析时间戳 analysis_YYYYMMDD_HHMMSS.csv
-                    ts_part = f.replace("analysis_", "").replace(".csv", "")
-                    dt = datetime.datetime.strptime(ts_part, "%Y%m%d_%H%M%S")
-                    display_time = dt.strftime("%Y-%m-%d %H:%M")
-                    
-                    if hist_expander.button(f"📊 分析记录 ({display_time})", key=f"hist_{f}"):
-                        with st.spinner(f"正在加载 {display_time} 的分析记录..."):
-                            try:
-                                loaded_df = pd.read_csv(os.path.join(history_dir, f))
-                                st.session_state['custom_comment_data'] = loaded_df
-                                # 恢复为当前活跃文件，以便页面刷新后保持
-                                loaded_df.to_csv(history_file_path, index=False)
-                                st.session_state['data_cleared'] = False
-                                st.session_state['viewing_history'] = True
-                                st.rerun()
-                            except Exception as load_err:
-                                hist_expander.error(f"加载失败: {load_err}")
-                except Exception as e:
-                    # 忽略文件名格式不匹配的文件
-                    continue
-            
-    st.sidebar.markdown("---")
-
-    # 加载数据 (逻辑：有自定义数据 OR (有历史查看标记 AND 有数据))
-    # 注意：如果 data_cleared=True，通常不再显示数据。但如果是查看历史操作触发的，我们要强制显示。
-    if 'custom_comment_data' in st.session_state:
-        # 即使 data_cleared=True，但如果有 custom_comment_data (由历史记录加载)，我们也显示
-        # sidebar_navigation 会负责在切换页面时清理这个 custom_comment_data
-        
-        processed_df = st.session_state['custom_comment_data']
-        
-        # 转换格式以适配现有 UI
-        sentiment_map = {
-            "正面": "positive",
-            "负面": "negative",
-            "中性": "neutral"
-        }
-        
-        # 构造符合 UI 要求的 DataFrame
-        data = {
-            'id': range(1, len(processed_df) + 1),
-            'comment': processed_df['review_content'],
-            'sentiment': processed_df['sentiment_label'].map(sentiment_map).fillna('neutral'),
-            'rating': processed_df['rating'],
-            'sentiment_keywords': None,
-            'solution': processed_df['solution'],
-            # 生成模拟日期 (因为上传的数据可能没有日期)
-            'date': pd.date_range(start='2023-01-01', periods=len(processed_df), freq='H'),
-            'category': processed_df['product_category']
-        }
-        
-        # 处理日期长度
-        if len(data['date']) < len(processed_df):
-             # 如果生成的日期不够，进行随机采样填充
-             data['date'] = np.random.choice(data['date'], len(processed_df))
-        
-        # 随机打乱日期
-        dates = list(data['date'])
-        np.random.shuffle(dates)
-        data['date'] = dates
-        
-        df = pd.DataFrame(data)
-    else:
-        # 第一次进入或数据被清空
+    if filtered_df is None:
         st.info("👋 欢迎使用评论分析！\n\n请在左侧侧边栏上传您的 CSV/XLSX 评论数据文件以开始分析。")
         return
-    
-    # 侧边栏过滤器
-    st.sidebar.markdown("### 数据筛选")
-    
-    # 情感筛选
-    with st.sidebar.expander("选择情感类型", expanded=False):
-        sentiment_filter = st.multiselect(
-            "选择情感类型",
-            options=df['sentiment'].unique(),
-            default=df['sentiment'].unique(),
-            label_visibility="collapsed"
-        )
-    
-    # 评分筛选
-    with st.sidebar.expander("评分范围", expanded=False):
-        rating_filter = st.slider(
-            "评分范围",
-            min_value=int(df['rating'].min()),
-            max_value=int(df['rating'].max()),
-            value=(int(df['rating'].min()), int(df['rating'].max())),
-            label_visibility="collapsed"
-        )
-    
-    # 类别筛选
-    with st.sidebar.expander("选择产品分类", expanded=False):
-        category_filter = st.multiselect(
-            "选择产品分类",
-            options=df['category'].unique(),
-            default=df['category'].unique(),
-            label_visibility="collapsed"
-        )
-    
-    # 应用过滤器
-    filtered_df = df[
-        (df['sentiment'].isin(sentiment_filter)) &
-        (df['rating'].between(rating_filter[0], rating_filter[1])) &
-        (df['category'].isin(category_filter))
-    ].copy()
     
     # 显示数据概览
     st.markdown("### 数据概览")

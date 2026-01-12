@@ -1,6 +1,7 @@
 # View/frontend/app.py
 import streamlit as st
 import os
+import requests
 
 # 设置 API Key 环境变量 (用户配置)
 os.environ["DASHSCOPE_API_KEY"] = "sk-6285b3701d014538b142e05637c14b5b"
@@ -12,6 +13,9 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# 从 secrets 获取后端地址（线上用 Tunnel URL，本地可测试用 localhost）
+BACKEND_URL = st.secrets.get("BACKEND_URL", "http://localhost:8000")
 
 from components.comment_analysis import show_comment_analysis
 from components.image_analysis import show_image_analysis
@@ -36,7 +40,7 @@ def main():
     # 显示选定的页面
     if current_page in PAGES:
         page_function = PAGES[current_page]
-        page_function()
+        page_function(BACKEND_URL)
     else:
         st.error(f"页面 '{current_page}' 不存在")
 
