@@ -1,8 +1,8 @@
 {
   "functions": {
-    "api/**/*.py": {
-      "runtime": "python3.10.19"
+    "*.py": {
+      "runtime": "vercel-python@3.10.19"
     }
   },
-  "rewrites": [{ "source": "/(.*)", "destination": "/api/main" }]
+  "rewrites": [{ "source": "/(.*)", "destination": "/main" }]
 }
