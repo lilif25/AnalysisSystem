@@ -30,9 +30,8 @@ app.include_router(analysis_router)
 async def root():
     return {"message": "欢迎使用多模态反馈平台 API"}
 
-def handler(request):
-    from mangum import Mangum
-    return Mangum(app)(request)
+from mangum import Mangum
+handler = Mangum(app)
 
 if __name__ == "__main__":
     import uvicorn
