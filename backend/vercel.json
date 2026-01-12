@@ -1,5 +1,8 @@
 {
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/main" }
-  ]
+  "functions": {
+    "api/**/*.py": {
+      "runtime": "python3.10.19"
+    }
+  },
+  "rewrites": [{ "source": "/(.*)", "destination": "/api/main" }]
 }
