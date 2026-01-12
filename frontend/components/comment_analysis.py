@@ -302,7 +302,7 @@ def render_sidebar():
     return filtered_df
 
 
-def show_comment_analysis():
+def show_comment_analysis(backend_url=None):
     """
     显示评论分析页面 (内容区域)
     """

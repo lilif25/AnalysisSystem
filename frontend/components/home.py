@@ -19,7 +19,7 @@ except ImportError:
     # Fallback
     def render_header(title, subtitle=None): st.title(title)
 
-def show_home():
+def show_home(backend_url=None):
     """
     显示首页内容
     """

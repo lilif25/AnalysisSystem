@@ -1,6 +1,6 @@
 import streamlit as st
 
-def create_custom_sidebar():
+def create_custom_sidebar(backend_url=None):
     """
     创建一个美观的自定义侧边导航栏
     """

@@ -17,7 +17,7 @@ try:
 except ImportError:
     def render_header(title, subtitle=None): st.title(title)
 
-def show_image_analysis():
+def show_image_analysis(backend_url):
     """
     显示图像分析页面
     """

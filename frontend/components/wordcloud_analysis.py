@@ -29,7 +29,7 @@ except ImportError:
 plt.rcParams['font.sans-serif'] = ['SimHei']
 plt.rcParams['axes.unicode_minus'] = False
 
-def show_wordcloud_analysis():
+def show_wordcloud_analysis(backend_url=None):
     """
     显示内容词云分析页面
     """
