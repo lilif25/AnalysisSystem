@@ -1,6 +1,5 @@
 import streamlit as st
 import requests
-from utils.api import API_BASE_URL
 from PIL import Image
 import io
 import sys
