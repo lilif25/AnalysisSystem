@@ -130,9 +130,9 @@ def render_interactive_layout(section_id, component_map, initial_order):
                 opacity: 1;
                 width: 55%; 
                 height: 650px; /* 大幅增加高度以确保下方数据完全显示 */
-                transform: scale(1); /* 移除垂直居中变换 */
+                transform: translateX(-50%) scale(1); /* 添加水平居中变换 */
                 z-index: 20;
-                left: 22.5%; /* (100-55)/2 */
+                left: 50%; /* 改为50%以实现精确水平居中 */
                 top: 0; /* 改为顶部对齐 */
                 box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
                 border: 2px solid #3b82f6;
@@ -144,9 +144,9 @@ def render_interactive_layout(section_id, component_map, initial_order):
                 opacity: 0.7;
                 width: 45%;
                 height: 650px; /* 大幅增加高度以确保下方数据完全显示 */
-                transform: translateX(-60%) scale(0.9) perspective(1000px) rotateY(15deg); /* 移除垂直居中变换 */
+                transform: translateX(-110%) scale(0.9) perspective(1000px) rotateY(15deg); /* 调整水平变换以匹配新的居中方式 */
                 z-index: 10;
-                left: 22.5%; /* Origin same as center, moved by transform */
+                left: 50%; /* 改为50%以实现精确水平居中 */
                 top: 20px; /* 改为顶部对齐 */
                 filter: brightness(0.95);
                 pointer-events: none; /* Let clicks pass through to layer */
@@ -157,9 +157,9 @@ def render_interactive_layout(section_id, component_map, initial_order):
                 opacity: 0.7;
                 width: 45%;
                 height: 650px; /* 大幅增加高度以确保下方数据完全显示 */
-                transform: translateX(60%) scale(0.9) perspective(1000px) rotateY(-15deg); /* 移除垂直居中变换 */
+                transform: translateX(10%) scale(0.9) perspective(1000px) rotateY(-15deg); /* 调整水平变换以匹配新的居中方式 */
                 z-index: 10;
-                left: 22.5%; /* Origin same as center, moved by transform */
+                left: 50%; /* 改为50%以实现精确水平居中 */
                 top: 20px; /* 改为顶部对齐 */
                 filter: brightness(0.95);
                 pointer-events: none;
@@ -584,54 +584,100 @@ def show_comment_analysis(backend_url=None):
     # 显示数据概览
     st.markdown("### 数据概览")
     
-    # 使用 Plotly Indicator 创建仪表盘样式
-    col1, col2, col3, col4 = st.columns(4)
+    # 添加简洁居中样式
+    st.markdown("""
+    <style>
+    .dashboard-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
     
-    with col1:
-        fig = go.Figure(go.Indicator(
-            mode = "number",
-            value = len(filtered_df),
-            title = {"text": "总评论数"},
-            domain = {'x': [0, 1], 'y': [0, 1]}
-        ))
-        fig.update_layout(height=200, margin=dict(l=120, r=40, t=60, b=80))
-        st.plotly_chart(fig, use_container_width=True)
+    .dashboard-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 2rem 1rem;
+        text-align: center;
+        color: #1f2937;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        min-height: 140px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
     
-    with col2:
-        avg_rating = filtered_df['rating'].mean()
-        fig = go.Figure(go.Indicator(
-            mode = "number",
-            value = avg_rating,
-            title = {"text": "平均评分"},
-            number = {'valueformat': ".2f"},
-            domain = {'x': [0, 1], 'y': [0, 1]}
-        ))
-        fig.update_layout(height=200, margin=dict(l=120, r=40, t=60, b=80))
-        st.plotly_chart(fig, use_container_width=True)
+    .dashboard-card:hover {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-color: #3b82f6;
+    }
     
-    with col3:
-        positive_pct = (filtered_df['sentiment'] == 'positive').sum() / len(filtered_df) * 100
-        fig = go.Figure(go.Indicator(
-            mode = "number",
-            value = positive_pct,
-            title = {"text": "正面评论比例(%)"},
-            number = {'valueformat': ".1f"},
-            domain = {'x': [0, 1], 'y': [0, 1]}
-        ))
-        fig.update_layout(height=200, margin=dict(l=120, r=40, t=60, b=80))
-        st.plotly_chart(fig, use_container_width=True)
-        
-    with col4:
-        negative_pct = (filtered_df['sentiment'] == 'negative').sum() / len(filtered_df) * 100
-        fig = go.Figure(go.Indicator(
-            mode = "number",
-            value = negative_pct,
-            title = {"text": "负面评论比例(%)"},
-            number = {'valueformat': ".1f"},
-            domain = {'x': [0, 1], 'y': [0, 1]}
-        ))
-        fig.update_layout(height=200, margin=dict(l=120, r=40, t=60, b=80))
-        st.plotly_chart(fig, use_container_width=True)
+    .card-number {
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #1f2937;
+    }
+    
+    .card-label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #6b7280;
+    }
+    
+    /* 动画效果 */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .dashboard-card {
+        animation: fadeInUp 0.4s ease-out;
+    }
+    
+    .dashboard-card:nth-child(1) { animation-delay: 0.1s; }
+    .dashboard-card:nth-child(2) { animation-delay: 0.2s; }
+    .dashboard-card:nth-child(3) { animation-delay: 0.3s; }
+    .dashboard-card:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # 计算数据
+    total_comments = len(filtered_df)
+    avg_rating = filtered_df['rating'].mean()
+    positive_pct = (filtered_df['sentiment'] == 'positive').sum() / len(filtered_df) * 100
+    negative_pct = (filtered_df['sentiment'] == 'negative').sum() / len(filtered_df) * 100
+    
+    # 创建简洁的仪表盘卡片
+    st.markdown(f"""
+    <div class="dashboard-container">
+        <div class="dashboard-card">
+            <div class="card-number">{total_comments:,}</div>
+            <div class="card-label">总评论数</div>
+        </div>
+        <div class="dashboard-card">
+            <div class="card-number">{avg_rating:.2f}</div>
+            <div class="card-label">平均评分</div>
+        </div>
+        <div class="dashboard-card">
+            <div class="card-number">{positive_pct:.1f}%</div>
+            <div class="card-label">正面评论比例</div>
+        </div>
+        <div class="dashboard-card">
+            <div class="card-number">{negative_pct:.1f}%</div>
+            <div class="card-label">负面评论比例</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
     
     
@@ -778,6 +824,18 @@ def show_comment_analysis(backend_url=None):
             title="分类统计详情 (面积=评论数)",
             color_continuous_scale='Viridis'
         )
+        fig.update_layout(
+            margin=dict(l=160, r=80, t=60, b=80),  # 增加左侧边距为颜色条留出空间
+            coloraxis_colorbar=dict(
+                x=-0.1,  # 移到图表左侧外边
+                y=0.5,   # 垂直居中
+                xanchor='right',
+                yanchor='middle',
+                title='平均评分',
+                thickness=15,
+                len=0.6
+            )
+        )
         return fig
 
     
@@ -908,7 +966,7 @@ def show_comment_analysis(backend_url=None):
             )
             fig_words.update_traces(marker_color='#3b82f6')
             fig_words.update_xaxes(tickangle=45)
-            fig_words.update_layout(margin=dict(l=120, r=40, t=60, b=80))
+            fig_words.update_layout(margin=dict(l=120, r=80, t=60, b=80))  # 增加右侧边距以防止图例被遮挡
             fig_words.update_yaxes(title_standoff=18)
             return fig_words
         else:
@@ -958,7 +1016,18 @@ def show_comment_analysis(backend_url=None):
                 color='频次',
                 color_continuous_scale='Blues'
             )
-            fig.update_layout(margin=dict(l=120, r=40, t=60, b=80))
+            fig.update_layout(
+                margin=dict(l=160, r=80, t=60, b=80),  # 增加左侧边距为颜色条留出空间
+                coloraxis_colorbar=dict(
+                    x=-0.1,  # 移到图表左侧外边
+                    y=0.5,   # 垂直居中
+                    xanchor='right',
+                    yanchor='middle',
+                    title='频次',
+                    thickness=15,
+                    len=0.6
+                )
+            )
             return fig
         else:
             return None
