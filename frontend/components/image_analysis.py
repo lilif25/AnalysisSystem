@@ -63,6 +63,13 @@ def show_image_analysis(backend_url):
                         if response.status_code == 200:
                             result = response.json()
                             
+                            # 保存上下文供 AI 助手使用
+                            st.session_state['image_analysis_context'] = {
+                                'type': target_task,
+                                'data': result,
+                                'filename': uploaded_file.name
+                            }
+                            
                             st.success("处理完成！")
                             
                             if target_task == "analysis":

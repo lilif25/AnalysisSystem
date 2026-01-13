@@ -17,7 +17,7 @@ except ImportError:
     # Fallback
     pass
 
-def show_ai_assistant():
+def show_ai_assistant(backend_url=None):
     st.title("🤖 AI 智能助手 (Qwen)")
     st.markdown("基于通义千问大模型的智能对话助手")
     

@@ -11,7 +11,7 @@ def create_custom_sidebar(backend_url=None):
     # 侧边栏标题
     st.sidebar.markdown(
         """
-        <h1 style='text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-bottom: 20px;'>🔍 多模态分析</h1>
+        <h1 style='text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-bottom: 20px;'>多模态分析</h1>
         """, 
         unsafe_allow_html=True
     )
