@@ -68,7 +68,7 @@ def render_interactive_layout(section_id, component_map, initial_order):
                             margin['l'] = max(margin.get('l', 0), 120)
                             margin['r'] = max(margin.get('r', 0), 40)
                             margin['t'] = max(margin.get('t', 0), 60)
-                            margin['b'] = max(margin.get('b', 0), 80)
+                            margin['b'] = max(margin.get('b', 0), 130)
                         fig_dict['layout']['paper_bgcolor'] = 'rgba(0,0,0,0)'
                     
                     chart_data[key] = fig_dict
@@ -97,12 +97,12 @@ def render_interactive_layout(section_id, component_map, initial_order):
             .container {{
                 position: relative;
                 width: 100%;
-                height: 480px; /* Increased height for better fit */
+                height: 800px; /* 大幅增加高度以确保下方数据完全显示 */
                 perspective: 1200px;
                 display: flex;
                 justify-content: center;
-                align-items: flex-start;
-                padding-top: 20px;
+                align-items: flex-start; /* 改为顶部对齐，避免垂直居中导致的截断 */
+                padding-top: 20px; /* 减少顶部填充以提供更多下方空间 */
             }}
             
             /* 卡片基础样式 */
@@ -129,11 +129,11 @@ def render_interactive_layout(section_id, component_map, initial_order):
             .chart-card.pos-top {{
                 opacity: 1;
                 width: 55%; 
-                height: 500px; /* 增高以避免图表文字被裁切 */
-                transform: translateX(0) scale(1);
+                height: 650px; /* 大幅增加高度以确保下方数据完全显示 */
+                transform: scale(1); /* 移除垂直居中变换 */
                 z-index: 20;
                 left: 22.5%; /* (100-55)/2 */
-                top: 0;
+                top: 0; /* 改为顶部对齐 */
                 box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
                 border: 2px solid #3b82f6;
                 pointer-events: auto;
@@ -143,11 +143,11 @@ def render_interactive_layout(section_id, component_map, initial_order):
             .chart-card.pos-left {{
                 opacity: 0.7;
                 width: 45%;
-                height: 500px; /* 略增高度以容纳完整图表 */
-                transform: translateX(-60%) scale(0.9) perspective(1000px) rotateY(15deg);
+                height: 650px; /* 大幅增加高度以确保下方数据完全显示 */
+                transform: translateX(-60%) scale(0.9) perspective(1000px) rotateY(15deg); /* 移除垂直居中变换 */
                 z-index: 10;
                 left: 22.5%; /* Origin same as center, moved by transform */
-                top: 20px;
+                top: 20px; /* 改为顶部对齐 */
                 filter: brightness(0.95);
                 pointer-events: none; /* Let clicks pass through to layer */
             }}
@@ -156,11 +156,11 @@ def render_interactive_layout(section_id, component_map, initial_order):
             .chart-card.pos-right {{
                 opacity: 0.7;
                 width: 45%;
-                height: 500px; /* 略增高度以容纳完整图表 */
-                transform: translateX(60%) scale(0.9) perspective(1000px) rotateY(-15deg);
+                height: 650px; /* 大幅增加高度以确保下方数据完全显示 */
+                transform: translateX(60%) scale(0.9) perspective(1000px) rotateY(-15deg); /* 移除垂直居中变换 */
                 z-index: 10;
                 left: 22.5%; /* Origin same as center, moved by transform */
-                top: 20px;
+                top: 20px; /* 改为顶部对齐 */
                 filter: brightness(0.95);
                 pointer-events: none;
             }}
@@ -347,7 +347,7 @@ def render_interactive_layout(section_id, component_map, initial_order):
     </html>
     """
     
-    html(html_code, height=520, scrolling=False)
+    html(html_code, height=820, scrolling=False)  # 增加高度以匹配容器高度800px + 额外空间
 
 
 def render_sidebar():
