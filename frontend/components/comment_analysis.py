@@ -698,22 +698,37 @@ def show_comment_analysis(backend_url=None):
                 'neutral': '#636EFA'
             }
         )
-         # 显式设置 autosize
+         # 显式设置 autosize 和居中布局
         fig_pie.update_layout(
             autosize=True,
-            margin=dict(l=120, r=40, t=60, b=80),
+            margin=dict(l=80, r=80, t=80, b=80),  # 均衡的边距实现居中
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
             legend=dict(
-                x=0.02,  # 靠近左侧
-                y=0.98,  # 靠近顶部
-                xanchor='left',
+                x=0.5,    # 水平居中
+                y=-0.1,   # 移到图表下方
+                xanchor='center',
                 yanchor='top',
+                orientation='h',  # 水平排列
                 bgcolor='rgba(255,255,255,0.8)',
                 bordercolor='rgba(0,0,0,0.2)',
                 borderwidth=1
-            )
+            ),
+            # 饼图居中设置
+            uniformtext_minsize=12,
+            uniformtext_mode='hide',
+            showlegend=True
         )
+        
+        # 设置饼图在图表区域内的位置为居中
+        fig_pie.update_traces(
+            textposition='inside',
+            textinfo='percent+label',
+            insidetextorientation='radial',
+            pull=0.02,  # 轻微分离效果
+            marker=dict(line=dict(color='#ffffff', width=2))
+        )
+        
         return fig_pie
 
     def render_rating_bar():
