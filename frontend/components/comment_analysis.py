@@ -768,7 +768,7 @@ def show_comment_analysis(backend_url=None):
         return fig
 
 
-    # 关键词分析定义
+    # 高频词分析定义
     
     # 文本处理逻辑 (保留原函数逻辑)
     def process_text(text):
@@ -960,9 +960,9 @@ def show_comment_analysis(backend_url=None):
             
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ---------------- 关键词分析交互式布局 ----------------
+    # ---------------- 文本分析交互式布局 ----------------
     st.markdown('<div class="css-card">', unsafe_allow_html=True)
-    st.markdown("### 关键词分析")
+    st.markdown("### 文本分析互动视图")
 
     render_interactive_layout(
         section_id="keyword_analysis",
