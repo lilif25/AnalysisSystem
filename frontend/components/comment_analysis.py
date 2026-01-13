@@ -59,7 +59,7 @@ def render_interactive_layout(section_id, component_map, initial_order):
                         fig_dict['layout'].pop('width', None)
                         fig_dict['layout'].pop('height', None)
                         fig_dict['layout']['autosize'] = True
-                        fig_dict['layout']['margin'] = dict(l=120, r=20, t=40, b=80)
+                        fig_dict['layout']['margin'] = dict(l=120, r=20, t=40, b=120)
                         fig_dict['layout']['paper_bgcolor'] = 'rgba(0,0,0,0)'
                     
                     chart_data[key] = fig_dict
