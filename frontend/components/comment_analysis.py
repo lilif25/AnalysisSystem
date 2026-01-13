@@ -59,7 +59,7 @@ def render_interactive_layout(section_id, component_map, initial_order):
                         fig_dict['layout'].pop('width', None)
                         fig_dict['layout'].pop('height', None)
                         fig_dict['layout']['autosize'] = True
-                        fig_dict['layout']['margin'] = dict(l=20, r=20, t=40, b=20)
+                        fig_dict['layout']['margin'] = dict(l=120, r=20, t=40, b=80)
                         fig_dict['layout']['paper_bgcolor'] = 'rgba(0,0,0,0)'
                     
                     chart_data[key] = fig_dict
@@ -106,7 +106,9 @@ def render_interactive_layout(section_id, component_map, initial_order):
                 transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
                 overflow: hidden;
                 box-sizing: border-box;
-                display: block;
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 /* Default to hidden state to prevent flash */
                 opacity: 0;
                 transform: scale(0.8) translateY(50px);
@@ -168,6 +170,10 @@ def render_interactive_layout(section_id, component_map, initial_order):
             .plot-container {{
                 width: 100%;
                 height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
             }}
 
             /* 交互层 - 用于捕捉点击 */
@@ -579,7 +585,7 @@ def show_comment_analysis(backend_url=None):
             title = {"text": "总评论数"},
             domain = {'x': [0, 1], 'y': [0, 1]}
         ))
-        fig.update_layout(height=200, margin=dict(l=20, r=20, t=50, b=20))
+        fig.update_layout(height=200, margin=dict(l=120, r=20, t=50, b=80))
         st.plotly_chart(fig, use_container_width=True)
     
     with col2:
@@ -591,7 +597,7 @@ def show_comment_analysis(backend_url=None):
             number = {'valueformat': ".2f"},
             domain = {'x': [0, 1], 'y': [0, 1]}
         ))
-        fig.update_layout(height=200, margin=dict(l=20, r=20, t=50, b=20))
+        fig.update_layout(height=200, margin=dict(l=120, r=20, t=50, b=80))
         st.plotly_chart(fig, use_container_width=True)
     
     with col3:
@@ -603,7 +609,7 @@ def show_comment_analysis(backend_url=None):
             number = {'valueformat': ".1f"},
             domain = {'x': [0, 1], 'y': [0, 1]}
         ))
-        fig.update_layout(height=200, margin=dict(l=20, r=20, t=50, b=20))
+        fig.update_layout(height=200, margin=dict(l=120, r=20, t=50, b=80))
         st.plotly_chart(fig, use_container_width=True)
         
     with col4:
@@ -615,7 +621,7 @@ def show_comment_analysis(backend_url=None):
             number = {'valueformat': ".1f"},
             domain = {'x': [0, 1], 'y': [0, 1]}
         ))
-        fig.update_layout(height=200, margin=dict(l=20, r=20, t=50, b=20))
+        fig.update_layout(height=200, margin=dict(l=120, r=20, t=50, b=80))
         st.plotly_chart(fig, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
     
@@ -637,6 +643,11 @@ def show_comment_analysis(backend_url=None):
                 'neutral': '#636EFA'
             }
         )
+        fig_pie.update_layout(
+            margin=dict(l=120, r=20, t=40, b=80),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)'
+        )
         return fig_pie
 
     def render_rating_bar():
@@ -651,7 +662,10 @@ def show_comment_analysis(backend_url=None):
             color=rating_counts.index,
             color_continuous_scale='RdYlGn' # 红黄绿渐变，低分红高分绿
         )
-        fig_bar.update_layout(coloraxis_showscale=False)
+        fig_bar.update_layout(
+            coloraxis_showscale=False,
+            margin=dict(l=120, r=20, t=60, b=80)
+        )
         return fig_bar
     
     def render_sentiment_summary_bubble():
@@ -669,6 +683,7 @@ def show_comment_analysis(backend_url=None):
             title="情感摘要 (大小=数量)",
             color_discrete_map={'positive': 'green', 'negative': 'red', 'neutral': 'blue'}
         )
+        fig.update_layout(margin=dict(l=120, r=20, t=60, b=80))
         return fig
 
     
@@ -682,6 +697,7 @@ def show_comment_analysis(backend_url=None):
             labels={'x': '产品分类', 'y': '评论数量'}
         )
         fig_cat_count.update_traces(marker_color='#3b82f6')
+        fig_cat_count.update_layout(margin=dict(l=120, r=20, t=60, b=80))
         return fig_cat_count
 
     def render_category_sentiment_bar():
@@ -702,6 +718,7 @@ def show_comment_analysis(backend_url=None):
             barmode='group',
             labels={'category': '产品分类', 'count': '数量', 'sentiment': '情感'}
         )
+        fig_cat_sentiment.update_layout(margin=dict(l=120, r=20, t=60, b=80))
         return fig_cat_sentiment
 
     def render_category_treemap():
@@ -718,6 +735,7 @@ def show_comment_analysis(backend_url=None):
             title="分类统计详情 (面积=评论数)",
             color_continuous_scale='Viridis'
         )
+        fig.update_layout(margin=dict(l=120, r=20, t=60, b=80))
         return fig
 
     
@@ -741,6 +759,7 @@ def show_comment_analysis(backend_url=None):
             labels={'month': '月份', 'rating': '平均评分'}
         )
         fig_rating_trend.update_traces(line_color='#636EFA')
+        fig_rating_trend.update_layout(margin=dict(l=120, r=20, t=60, b=80))
         return fig_rating_trend
         
     def render_sentiment_trend_line():
@@ -753,6 +772,7 @@ def show_comment_analysis(backend_url=None):
             labels={'month': '月份', 'sentiment': '正面比例(%)'}
         )
         fig_sentiment_trend.update_traces(line_color='#00CC96')
+        fig_sentiment_trend.update_layout(margin=dict(l=120, r=20, t=60, b=80))
         return fig_sentiment_trend
 
     def render_monthly_kpi_card():
@@ -764,7 +784,11 @@ def show_comment_analysis(backend_url=None):
         fig.add_trace(go.Bar(x=display_monthly['month_str'], y=display_monthly['count'], name='评论数', marker_color='#3b82f6'), row=2, col=1)
         fig.add_trace(go.Scatter(x=display_monthly['month_str'], y=display_monthly['sentiment'], mode='lines+markers', name='正面率'), row=3, col=1)
         
-        fig.update_layout(title="月度综合指标", showlegend=False)
+        fig.update_layout(
+            title="月度综合指标", 
+            showlegend=False,
+            margin=dict(l=120, r=20, t=60, b=80)
+        )
         return fig
 
 
@@ -842,6 +866,7 @@ def show_comment_analysis(backend_url=None):
             )
             fig_words.update_traces(marker_color='#3b82f6')
             fig_words.update_xaxes(tickangle=45)
+            fig_words.update_layout(margin=dict(l=120, r=20, t=60, b=80))
             return fig_words
         else:
             return None
@@ -855,6 +880,7 @@ def show_comment_analysis(backend_url=None):
             color='频次',
             color_continuous_scale='Blues'
         )
+        fig.update_layout(margin=dict(l=120, r=20, t=60, b=80))
         return fig
 
     def render_sentiment_butterfly():
@@ -876,6 +902,7 @@ def show_comment_analysis(backend_url=None):
             title="情感关键词对比 (左负右正)",
             color_discrete_map={'正面': 'green', '负面': 'red'}
         )
+        fig.update_layout(margin=dict(l=120, r=20, t=60, b=80))
         return fig
 
     # ---------------- 评论搜索与智能应对 ----------------
