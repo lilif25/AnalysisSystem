@@ -683,7 +683,7 @@ def show_comment_analysis(backend_url=None):
             title="情感摘要 (大小=数量)",
             color_discrete_map={'positive': 'green', 'negative': 'red', 'neutral': 'blue'}
         )
-        fig.update_layout(margin=dict(l=120, r=20, t=60, b=80))
+        fig.update_layout(height=600, margin=dict(l=120, r=20, t=60, b=80))
         return fig
 
     
@@ -697,7 +697,7 @@ def show_comment_analysis(backend_url=None):
             labels={'x': '产品分类', 'y': '评论数量'}
         )
         fig_cat_count.update_traces(marker_color='#3b82f6')
-        fig_cat_count.update_layout(margin=dict(l=120, r=20, t=60, b=80))
+        fig_cat_count.update_layout(height=600, margin=dict(l=120, r=20, t=60, b=80))
         return fig_cat_count
 
     def render_category_sentiment_bar():
@@ -718,7 +718,7 @@ def show_comment_analysis(backend_url=None):
             barmode='group',
             labels={'category': '产品分类', 'count': '数量', 'sentiment': '情感'}
         )
-        fig_cat_sentiment.update_layout(margin=dict(l=120, r=20, t=60, b=80))
+        fig_cat_sentiment.update_layout(height=600, margin=dict(l=120, r=20, t=60, b=80))
         return fig_cat_sentiment
 
     def render_category_treemap():
@@ -735,7 +735,7 @@ def show_comment_analysis(backend_url=None):
             title="分类统计详情 (面积=评论数)",
             color_continuous_scale='Viridis'
         )
-        fig.update_layout(margin=dict(l=120, r=20, t=60, b=80))
+        fig.update_layout(height=600, margin=dict(l=120, r=20, t=60, b=80))
         return fig
 
     
@@ -866,7 +866,7 @@ def show_comment_analysis(backend_url=None):
             )
             fig_words.update_traces(marker_color='#3b82f6')
             fig_words.update_xaxes(tickangle=45)
-            fig_words.update_layout(margin=dict(l=120, r=20, t=60, b=80))
+            fig_words.update_layout(height=600, margin=dict(l=120, r=20, t=60, b=80))
             return fig_words
         else:
             return None
@@ -880,7 +880,7 @@ def show_comment_analysis(backend_url=None):
             color='频次',
             color_continuous_scale='Blues'
         )
-        fig.update_layout(margin=dict(l=120, r=20, t=60, b=80))
+        fig.update_layout(height=600, margin=dict(l=120, r=20, t=60, b=80))
         return fig
 
     def render_sentiment_butterfly():
@@ -902,7 +902,7 @@ def show_comment_analysis(backend_url=None):
             title="情感关键词对比 (左负右正)",
             color_discrete_map={'正面': 'green', '负面': 'red'}
         )
-        fig.update_layout(margin=dict(l=120, r=20, t=60, b=80))
+        fig.update_layout(height=600, margin=dict(l=120, r=20, t=60, b=80))
         return fig
 
     # ---------------- 评论搜索与智能应对 ----------------
